@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="BookFinderApp">
+<head>
+  <meta charset="UTF-8">
+  <title>Book Finder</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+<body>
+
+<div ng-controller="BookController">
+  <h1>Book Finder</h1>
+  
+  <input type="text" ng-model="searchQuery" placeholder="Search by title, author, or genre">
+  <button ng-click="searchBooks()">Search</button>
+
+  <ul>
+    <li ng-repeat="book in books">
+      <h2>{{ book.volumeInfo.title }}</h2>
+      <p ng-if="book.volumeInfo.authors">Author: {{ book.volumeInfo.authors.join(', ') }}</p>
+      <p ng-if="book.volumeInfo.categories">Genre: {{ book.volumeInfo.categories.join(', ') }}</p>
+      <p ng-if="book.volumeInfo.description">{{ book.volumeInfo.description }}</p>
+    </li>
+  </ul>
+</div>
+
+<script>
+  angular.module('BookFinderApp', [])
+    .controller('BookController', ['$scope', '$http', function($scope, $http) {
+      $scope.searchQuery = '';
+      $scope.books = [];
+
+$scope.searchBooks = function() {
+  $http.get('https://www.googleapis.com/books/v1/volumes?q=' + $scope.searchQuery)
+    .then(function(response) {
+      $scope.books = response.data.items;
+    }, function(error) {
+      console.log('Error fetching books:', error);
+    });
+};
+}]);
+</script>
+
+</body>
+</html>
